@@ -1,0 +1,23 @@
+server:
+  port: 9090
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/postgres
+    username: sjannur
+    password: toor
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mvc:
+    static-path-pattern: /static/**
+    pathmatch:
+      matching-strategy: ant_path_matcher
