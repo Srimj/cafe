@@ -21,7 +21,7 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long tableId;
-    private Double totalAmount;
+    private Long totalAmount;
     private String status;
     private LocalDateTime createDt;
 }

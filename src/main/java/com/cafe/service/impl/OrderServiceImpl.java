@@ -11,9 +11,11 @@ import com.cafe.service.OrderItemService;
 import com.cafe.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Orders placeOrder(Long tableId) {
         List<Cart> cart = cartService.getCart(tableId);
         if(cart.isEmpty())
@@ -42,12 +45,15 @@ public class OrderServiceImpl implements OrderService {
         Orders order = Orders.builder()
                 .tableId(tableId)
                 .createDt(LocalDateTime.now())
+                .totalAmount(0L)
                 .status("PENDING")
                 .build();
 
         order = orderRepository.save(order);
         for(Cart item : cart) {
-            Menu menuItem = menuService.getMenuById(item.getItemId());
+            Menu menuItem = menuService.getMenu().stream()
+                    .filter(it -> Objects.equals(it.getId(), item.getItemId()))
+                    .findAny().orElseGet(Menu::new);
 
             OrderItem orderItem = OrderItem.builder()
                     .itemId(item.getItemId())
@@ -56,8 +62,8 @@ public class OrderServiceImpl implements OrderService {
                     .itemName(menuItem.getName())
                     .orderId(order.getId())
                     .build();
-
-                    orderItemService.saveItem(orderItem);
+            order.setTotalAmount(order.getTotalAmount() + orderItem.getPrice());
+            orderItemService.saveItem(orderItem);
 
         }
         order = updateOrderStatus(order.getId(), "PLACED");
