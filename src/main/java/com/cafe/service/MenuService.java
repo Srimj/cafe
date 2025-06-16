@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface MenuService {
     List<Menu> getMenu();
+    Menu checkIfItemExists(Long id);
 }
